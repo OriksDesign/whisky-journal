@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Ardbeg 10",
+    "slug": "ardbeg-10",
+    "content": "Класичний торф'яний віскі з острова Айла.",
+    "region_slug": "islay",
+    "classification_slug": "peated",
+    "age": 10,
+    "abv": "46%",
+    "image_url": "https://example.com/images/ardbeg10.jpg"
+  },
+  {
+    "title": "Macallan 12 Sherry Oak",
+    "slug": "macallan-12-sherry-oak",
+    "content": "Витриманий у бочках з-під хересу, солодкий і насичений.",
+    "region_slug": "highlands",
+    "classification_slug": "sherry-cask",
+    "age": 12,
+    "abv": "40%",
+    "image_url": "https://example.com/images/macallan12.jpg"
+  },
+  {
+    "title": "Jameson",
+    "slug": "jameson",
+    "content": "Найвідоміший ірландський віскі.",
+    "region_slug": "irish-whiskey",
+    "classification_slug": "blended-whisky",
+    "age": 0,
+    "abv": "40%",
+    "image_url": "https://example.com/images/jameson.jpg"
+  },
+  {
+    "title": "Jack Daniel’s Old No.7",
+    "slug": "jack-daniels-old-no7",
+    "content": "Легендарний теннессійський віскі.",
+    "region_slug": "tennessee-whiskey",
+    "classification_slug": "tennessee",
+    "age": 0,
+    "abv": "40%",
+    "image_url": "https://example.com/images/jackdaniels.jpg"
+  },
+  {
+    "title": "Yamazaki 12",
+    "slug": "yamazaki-12",
+    "content": "Японський односолодовий віскі, витриманий у бочках з-під хересу.",
+    "region_slug": "japanese-whisky",
+    "classification_slug": "single-malt",
+    "age": 12,
+    "abv": "43%",
+    "image_url": "https://example.com/images/yamazaki12.jpg"
+  },
+  {
+    "title": "Canadian Club",
+    "slug": "canadian-club",
+    "content": "Легкий канадський купажований віскі.",
+    "region_slug": "canada",
+    "classification_slug": "blended-whisky",
+    "age": 0,
+    "abv": "40%",
+    "image_url": "https://example.com/images/canadianclub.jpg"
+  },
+  {
+    "title": "Amrut Fusion",
+    "slug": "amrut-fusion",
+    "content": "Індійський односолодовий віскі, популярний у світі.",
+    "region_slug": "india",
+    "classification_slug": "single-malt",
+    "age": 0,
+    "abv": "50%",
+    "image_url": "https://example.com/images/amrutfusion.jpg"
+  },
+  {
+    "title": "Wild Turkey 101",
+    "slug": "wild-turkey-101",
+    "content": "Бурбон з високою міцністю та насиченим смаком.",
+    "region_slug": "bourbon",
+    "classification_slug": "bourbon-cask",
+    "age": 0,
+    "abv": "50.5%",
+    "image_url": "https://example.com/images/wildturkey101.jpg"
+  }
+]

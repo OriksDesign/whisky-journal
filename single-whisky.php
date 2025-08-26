@@ -1,177 +1,194 @@
 <?php
 /**
  * Single Whisky
- * Path: wp-content/themes/whisky-journal-2025/single-whisky.php
+ * Шаблон сторінки окремого віскі (CPT: whisky)
  */
 
 get_header();
 
-while ( have_posts() ) : the_post();
+while ( have_posts() ) :
+	the_post();
 
-$id = get_the_ID();
+	$pid   = get_the_ID();
+	$title = get_the_title();
 
-/** ACF (працює і без ACF — просто порожні значення) */
-$acf = function_exists('get_field');
-$abv        = $acf ? get_field('abv') : '';
-$age        = $acf ? get_field('age') : '';
-$cask       = $acf ? get_field('cask') : '';
-$volume     = $acf ? get_field('volume') : '';
-$tasting    = $acf ? get_field('tasting_notes') : '';
-$gallery    = $acf ? (array) get_field('gallery') : []; // масив зображень (id/url)
+	// Meta
+	$age_raw = get_post_meta( $pid, 'age', true );
+	$abv_raw = get_post_meta( $pid, 'abv', true );
 
-/** Таксономії */
-$regions         = wp_get_post_terms( $id, 'region', ['fields' => 'all'] );
-$classifications = wp_get_post_terms( $id, 'classification', ['fields' => 'all'] );
+	$age_out = ($age_raw !== '' && $age_raw !== null) ? (int) $age_raw : '0';
+	if ( $abv_raw !== '' && $abv_raw !== null ) {
+		$abv_num = (float) $abv_raw;
+		$abv_out = rtrim( rtrim( number_format( $abv_num, 1, '.', '' ), '0' ), '.' );
+	} else {
+		$abv_out = '—';
+	}
+
+	// Таксономії
+	$region_terms = get_the_terms( $pid, 'region' );
+	$region       = ( $region_terms && ! is_wp_error( $region_terms ) ) ? $region_terms[0] : null;
+
+	$class_terms  = get_the_terms( $pid, 'classification' );
+	$classification = ( $class_terms && ! is_wp_error( $class_terms ) ) ? $class_terms[0] : null;
+
+	// Зображення
+	$img_id      = get_post_thumbnail_id();
+	$placeholder = get_stylesheet_directory_uri() . '/whisky.png';
+	$img_html    = '';
+
+	if ( $img_id ) {
+		$img_html = wp_get_attachment_image(
+			$img_id,
+			'wj_hero', // додається у functions.php (add_image_size)
+			false,
+			[
+				'class'    => 'wj-img',
+				'loading'  => 'eager',
+				'decoding' => 'async',
+				'sizes'    => '(min-width:1024px) 720px, 100vw',
+				'alt'      => esc_attr( $title ),
+			]
+		);
+	}
+
+	// Посилання
+	$home_url     = home_url( '/' );
+	$catalog_url  = get_post_type_archive_link( 'whisky' );
+
 ?>
+<main class="max-w-screen-xl mx-auto px-4 py-8">
 
-<main id="primary" class="site-main">
-  <article <?php post_class('max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10'); ?>>
+	<!-- Хлібні крихти -->
+	<nav class="text-sm mb-6 text-slate-600" aria-label="<?php echo esc_attr__( 'Breadcrumb', 'whisky' ); ?>">
+		<ol class="flex flex-wrap gap-2 items-center">
+			<li><a class="hover:underline" href="<?php echo esc_url( $home_url ); ?>"><?php esc_html_e( 'Головна', 'whisky' ); ?></a></li>
+			<li class="opacity-50">/</li>
+			<li><a class="hover:underline" href="<?php echo esc_url( $catalog_url ); ?>"><?php esc_html_e( 'Каталог', 'whisky' ); ?></a></li>
+			<li class="opacity-50">/</li>
+			<li class="font-medium text-slate-900"><?php echo esc_html( $title ); ?></li>
+		</ol>
+	</nav>
 
-    <!-- Header -->
-    <header class="mb-8">
-      <nav class="text-sm mb-3">
-        <a href="<?php echo esc_url( get_post_type_archive_link('whisky') ); ?>" class="hover:underline">Каталог</a>
-        <span class="mx-1 opacity-60">/</span>
-        <span class="opacity-80"><?php the_title(); ?></span>
-      </nav>
+	<div class="grid gap-8 lg:grid-cols-2 items-start">
+		<!-- HERO зображення без кропу -->
+		<div class="wj-media bg-[#eef3f7] rounded-2xl overflow-hidden">
+			<?php if ( $img_html ) : ?>
+				<?php echo $img_html; ?>
+			<?php else : ?>
+				<img src="<?php echo esc_url( $placeholder ); ?>" alt="" class="wj-img" />
+			<?php endif; ?>
+		</div>
 
-      <h1 class="text-3xl sm:text-4xl font-semibold"><?php the_title(); ?></h1>
+		<!-- Правий блок: заголовок + мета + опис + дії -->
+		<section>
+			<h1 class="text-3xl md:text-4xl font-extrabold mb-4 text-slate-900"><?php echo esc_html( $title ); ?></h1>
 
-      <?php if ( $regions || $classifications ) : ?>
-        <div class="mt-3 flex flex-wrap gap-2 text-sm">
-          <?php foreach ($regions as $t) : ?>
-            <a class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900"
-               href="<?php echo esc_url( get_term_link($t) ); ?>"><?php echo esc_html($t->name); ?></a>
-          <?php endforeach; ?>
-          <?php foreach ($classifications as $t) : ?>
-            <a class="px-2.5 py-1 rounded-full bg-stone-100 text-stone-900"
-               href="<?php echo esc_url( get_term_link($t) ); ?>"><?php echo esc_html($t->name); ?></a>
-          <?php endforeach; ?>
-        </div>
-      <?php endif; ?>
-    </header>
+			<ul class="text-sm text-slate-700 space-y-1 mb-4">
+				<li>
+					<span class="opacity-70"><?php esc_html_e( 'Вік:', 'whisky' ); ?></span>
+					<strong class="ml-1"><?php echo esc_html( $age_out ); ?></strong>
+				</li>
+				<li>
+					<span class="opacity-70"><?php esc_html_e( 'ABV:', 'whisky' ); ?></span>
+					<strong class="ml-1"><?php echo esc_html( is_numeric( $abv_out ) ? $abv_out . '%' : $abv_out ); ?></strong>
+				</li>
+				<?php if ( $region ) : ?>
+				<li>
+					<span class="opacity-70"><?php esc_html_e( 'Регіон:', 'whisky' ); ?></span>
+					<a class="ml-1 hover:underline"
+					   href="<?php echo esc_url( get_term_link( $region ) ); ?>">
+						<?php echo esc_html( $region->name ); ?>
+					</a>
+				</li>
+				<?php endif; ?>
+				<?php if ( $classification ) : ?>
+				<li>
+					<span class="opacity-70"><?php esc_html_e( 'Класифікація:', 'whisky' ); ?></span>
+					<a class="ml-1 hover:underline"
+					   href="<?php echo esc_url( get_term_link( $classification ) ); ?>">
+						<?php echo esc_html( $classification->name ); ?>
+					</a>
+				</li>
+				<?php endif; ?>
+			</ul>
 
-    <!-- Content grid -->
-    <div class="grid md:grid-cols-2 gap-8 items-start">
+			<div class="prose max-w-none mb-6">
+				<?php
+				$desc = get_the_content();
+				if ( ! empty( $desc ) ) {
+					the_content();
+				} else {
+					echo '<p class="text-slate-700">' . esc_html__( 'Опис буде додано найближчим часом.', 'whisky' ) . '</p>';
+				}
+				?>
+			</div>
 
-      <!-- Images -->
-      <section>
-        <?php if ( has_post_thumbnail() ) : ?>
-          <figure class="mb-4 overflow-hidden rounded-xl bg-white shadow">
-            <?php the_post_thumbnail( 'large', [
-              'class' => 'w-full h-auto object-contain',
-              'alt'   => esc_attr( get_the_title() ),
-            ] ); ?>
-          </figure>
-        <?php endif; ?>
+			<div class="flex flex-wrap gap-3">
+				<a href="<?php echo esc_url( $catalog_url ); ?>"
+				   class="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-slate-300 hover:bg-slate-50">
+					<span aria-hidden="true">←</span>
+					<?php esc_html_e( 'До каталогу', 'whisky' ); ?>
+				</a>
 
-        <?php if ( !empty($gallery) ) : ?>
-          <div class="grid grid-cols-4 gap-3">
-            <?php foreach ( $gallery as $img ) :
-              $src = is_array($img) ? ($img['sizes']['medium'] ?? $img['url']) : wp_get_attachment_image_url($img, 'medium');
-              $full = is_array($img) ? $img['url'] : wp_get_attachment_image_url($img, 'full');
-            ?>
-              <a href="<?php echo esc_url($full); ?>"
-                 class="block aspect-square overflow-hidden rounded-lg bg-white shadow"
-                 data-lightbox="whisky">
-                <img src="<?php echo esc_url($src); ?>" alt="" class="w-full h-full object-cover">
-              </a>
-            <?php endforeach; ?>
-          </div>
-        <?php endif; ?>
-      </section>
+				<?php if ( $classification ) : ?>
+					<a href="<?php echo esc_url( get_term_link( $classification ) ); ?>"
+					   class="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-slate-300 hover:bg-slate-50">
+						<?php esc_html_e( 'Більше з «', 'whisky' ); echo esc_html( $classification->slug ); echo '»'; ?>
+					</a>
+				<?php endif; ?>
+			</div>
+		</section>
+	</div>
 
-      <!-- Specs & content -->
-      <section>
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <?php if ($abv !== '') : ?>
-            <div class="rounded-lg bg-stone-100 p-4">
-              <div class="text-stone-500 text-xs uppercase">Міцність</div>
-              <div class="text-xl font-semibold"><?php echo esc_html( rtrim($abv, '%') ); ?>%</div>
-            </div>
-          <?php endif; ?>
+	<!-- Схожі віскі -->
+	<?php
+		$tax_query = [];
+		if ( $classification ) {
+			$tax_query[] = [
+				'taxonomy' => 'classification',
+				'field'    => 'term_id',
+				'terms'    => $classification->term_id,
+			];
+		}
+		if ( $region ) {
+			$tax_query[] = [
+				'taxonomy' => 'region',
+				'field'    => 'term_id',
+				'terms'    => $region->term_id,
+			];
+		}
+		if ( count( $tax_query ) > 1 ) {
+			$tax_query['relation'] = 'OR';
+		}
 
-          <?php if ($age !== '') : ?>
-            <div class="rounded-lg bg-stone-100 p-4">
-              <div class="text-stone-500 text-xs uppercase">Вік</div>
-              <div class="text-xl font-semibold"><?php echo esc_html( $age ); ?></div>
-            </div>
-          <?php endif; ?>
+		$related = new WP_Query( [
+			'post_type'           => 'whisky',
+			'posts_per_page'      => 6,
+			'post__not_in'        => [ $pid ],
+			'ignore_sticky_posts' => true,
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+			'tax_query'           => $tax_query,
+		] );
+	?>
 
-          <?php if ($cask !== '') : ?>
-            <div class="rounded-lg bg-stone-100 p-4">
-              <div class="text-stone-500 text-xs uppercase">Бочка</div>
-              <div class="font-medium"><?php echo esc_html( $cask ); ?></div>
-            </div>
-          <?php endif; ?>
+	<?php if ( $related->have_posts() ) : ?>
+		<section class="mt-12">
+			<h2 class="text-xl md:text-2xl font-semibold mb-4"><?php esc_html_e( 'Схожі віскі', 'whisky' ); ?></h2>
+			<div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+				<?php
+				while ( $related->have_posts() ) :
+					$related->the_post();
+					get_template_part( 'template-parts/content', 'whisky-card' );
+				endwhile;
+				wp_reset_postdata();
+				?>
+			</div>
+		</section>
+	<?php endif; ?>
 
-          <?php if ($volume !== '') : ?>
-            <div class="rounded-lg bg-stone-100 p-4">
-              <div class="text-stone-500 text-xs uppercase">Об’єм</div>
-              <div class="font-medium"><?php echo esc_html( $volume ); ?></div>
-            </div>
-          <?php endif; ?>
-        </div>
-
-        <div class="prose max-w-none">
-          <?php the_content(); ?>
-        </div>
-
-        <?php if ($tasting !== '') : ?>
-          <div class="mt-6 p-5 rounded-xl border border-amber-200 bg-amber-50">
-            <div class="text-amber-900 font-medium mb-1">Ноти дегустації</div>
-            <p class="text-amber-900/90"><?php echo esc_html( $tasting ); ?></p>
-          </div>
-        <?php endif; ?>
-      </section>
-    </div>
-
-    <!-- Related -->
-    <?php
-    $related_ids = [];
-    if ( $regions )         $related_ids = array_merge( $related_ids, wp_list_pluck($regions, 'term_id') );
-    if ( $classifications ) $related_ids = array_merge( $related_ids, wp_list_pluck($classifications, 'term_id') );
-
-    if ( $related_ids ) :
-      $rel = new WP_Query([
-        'post_type'      => 'whisky',
-        'posts_per_page' => 3,
-        'post__not_in'   => [$id],
-        'tax_query'      => [
-          'relation' => 'OR',
-          [
-            'taxonomy' => 'region',
-            'field'    => 'term_id',
-            'terms'    => wp_list_pluck($regions, 'term_id'),
-          ],
-          [
-            'taxonomy' => 'classification',
-            'field'    => 'term_id',
-            'terms'    => wp_list_pluck($classifications, 'term_id'),
-          ],
-        ],
-      ]);
-      if ( $rel->have_posts() ) : ?>
-        <section class="mt-12">
-          <h2 class="text-xl font-semibold mb-4">Схожі віскі</h2>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php
-            while ( $rel->have_posts() ) : $rel->the_post();
-              get_template_part('template-parts/content', 'whisky-card');
-            endwhile;
-            wp_reset_postdata();
-            ?>
-          </div>
-        </section>
-      <?php endif; wp_reset_postdata();
-    endif; ?>
-
-    <!-- Prev/Next -->
-    <nav class="mt-10 flex justify-between text-sm">
-      <div><?php previous_post_link('%link','← %title', true, '', 'whisky'); ?></div>
-      <div><?php next_post_link('%link','%title →', true, '', 'whisky'); ?></div>
-    </nav>
-  </article>
 </main>
+<?php
+endwhile;
 
-<?php endwhile; get_footer();
+get_footer();

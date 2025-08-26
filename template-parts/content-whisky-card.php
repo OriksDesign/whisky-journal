@@ -1,67 +1,81 @@
 <?php
 /**
- * Whisky card (used on archive)
+ * Template part: Whisky card
  */
+$pid       = get_the_ID();
+$permalink = get_permalink($pid);
+$title     = get_the_title($pid);
 
-/** @var int $post_id */
-$post_id = get_the_ID();
+// Таксономії
+$region_terms = get_the_terms($pid, 'region');
+$class_terms  = get_the_terms($pid, 'classification');
+$region_out   = ($region_terms && ! is_wp_error($region_terms)) ? $region_terms[0]->name : '';
+$class_out    = ($class_terms  && ! is_wp_error($class_terms )) ? $class_terms[0]->name  : '';
 
-// Age (years) and ABV (%)
-$age = wj_get_number_meta( $post_id, 'age' );
-$abv = wj_get_number_meta( $post_id, 'abv' );
+// Мета
+$age_raw = get_post_meta($pid, 'age', true);
+$abv_raw = get_post_meta($pid, 'abv', true);
+$age_out = ($age_raw !== '' && $age_raw !== null) ? (int) $age_raw : '0';
+if ($abv_raw !== '' && $abv_raw !== null) {
+  $abv_num = (float) $abv_raw;
+  $abv_out = rtrim(rtrim(number_format($abv_num, 1, '.', ''), '0'), '.');
+} else {
+  $abv_out = '0';
+}
 
-// Terms
-$region_txt = wj_terms_list( $post_id, 'region' );
-$class_txt  = wj_terms_list( $post_id, 'classification' );
-
-// Image
-$thumb_html = get_the_post_thumbnail( $post_id, 'whisky-card', [
-	'style' => 'width:100%;height:auto;display:block;border-radius:12px;object-fit:cover;background:#f2f2f2;aspect-ratio:1/1;',
-	'alt'   => esc_attr( get_the_title() ),
-] );
+// Джерело зображення (може бути порожнім — тоді підхопить плейсхолдер у JS)
+$thumb_id  = get_post_thumbnail_id($pid);
+$thumb_img = $thumb_id
+  ? wp_get_attachment_image(
+      $thumb_id,
+      'large',
+      false,
+      [
+        'class'    => 'whisky-img w-full h-full object-contain',
+        'loading'  => 'lazy',
+        'decoding' => 'async',
+        'data-skeleton' => '1', // увімкнути skeleton у JS
+        'alt'      => esc_attr($title),
+      ]
+    )
+  : '<img class="whisky-img w-full h-full object-contain" data-skeleton="1" alt="' . esc_attr($title) . '">';
 
 ?>
-<article <?php post_class( 'wj-card' ); ?> style="border:1px solid #e5e5e5;border-radius:16px;padding:12px;overflow:hidden;background:#fff;">
-	<a href="<?php the_permalink(); ?>" style="display:block;text-decoration:none;color:inherit;">
-		<div class="wj-card-image" style="margin-bottom:12px;">
-			<?php
-			if ( $thumb_html ) {
-				echo $thumb_html; // phpcs:ignore WordPress.Security.EscapeOutput
-			} else {
-				// placeholder
-				echo '<div style="display:flex;align-items:center;justify-content:center;background:#f3f4f6;border-radius:12px;aspect-ratio:1/1;color:#999;">No image</div>';
-			}
-			?>
-		</div>
-		<h2 class="wj-card-title" style="font-size:18px;margin:0 0 6px 0;"><?php the_title(); ?></h2>
+<article class="whisky-card overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition">
+  <a href="<?php echo esc_url($permalink); ?>"
+     class="block"
+     data-prefetch="1" aria-label="<?php echo esc_attr($title); ?>">
+    <div class="media aspect-[4/3] bg-slate-100 p-3 flex items-center justify-center">
+      <?php echo $thumb_img; ?>
+    </div>
+  </a>
 
-		<?php if ( $region_txt || $class_txt ) : ?>
-			<div class="wj-meta" style="font-size:13px;color:#666;margin-bottom:6px;">
-				<?php if ( $region_txt ) : ?>
-					<span><?php echo esc_html( $region_txt ); ?></span>
-				<?php endif; ?>
-				<?php if ( $region_txt && $class_txt ) : ?>
-					<span> · </span>
-				<?php endif; ?>
-				<?php if ( $class_txt ) : ?>
-					<span><?php echo esc_html( $class_txt ); ?></span>
-				<?php endif; ?>
-			</div>
-		<?php endif; ?>
+  <div class="p-4">
+    <div class="absolute top-2 right-2 text-xs rounded-full border px-2 py-0.5 badge-abv">
+      ABV: <?php echo esc_html($abv_out); ?>%
+    </div>
 
-		<div class="wj-specs" style="display:flex;gap:12px;font-size:13px;color:#444;margin-bottom:8px;">
-			<?php
-			$age_txt = $age ? sprintf( /* translators: age in years */ __( 'Age: %d', 'whisky' ), (int) $age ) : __( 'Age: NAS', 'whisky' );
-			echo '<span>' . esc_html( $age_txt ) . '</span>';
+    <h3 class="font-semibold text-slate-900 leading-tight">
+      <a href="<?php echo esc_url($permalink); ?>" class="hover:underline"><?php echo esc_html($title); ?></a>
+    </h3>
 
-			if ( $abv !== null ) {
-				echo '<span>' . esc_html( sprintf( __( 'ABV: %s%%', 'whisky' ), rtrim( rtrim( (string) $abv, '0' ), '.' ) ) ) . '</span>';
-			}
-			?>
-		</div>
+    <?php if ($region_out || $class_out): ?>
+      <p class="mt-1 text-sm text-slate-600">
+        <?php
+          $meta_line = trim($region_out . ($region_out && $class_out ? ' • ' : '') . $class_out);
+          echo esc_html($meta_line);
+        ?>
+      </p>
+    <?php endif; ?>
 
-		<button style="display:inline-block;padding:6px 10px;border-radius:8px;background:#111;color:#fff;border:0;cursor:pointer;font-size:13px;">
-			<?php esc_html_e( 'Details', 'whisky' ); ?>
-		</button>
-	</a>
+    <p class="mt-1 text-sm text-slate-600 space-x-4">
+      <span>Age: <strong><?php echo esc_html($age_out); ?></strong></span>
+      <span>ABV: <strong><?php echo esc_html($abv_out); ?>%</strong></span>
+    </p>
+
+    <a href="<?php echo esc_url($permalink); ?>"
+       class="mt-3 inline-block rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">
+      Details
+    </a>
+  </div>
 </article>

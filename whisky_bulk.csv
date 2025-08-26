@@ -1,0 +1,9 @@
+title,slug,content,region_slug,classification_slug,age,abv,image_url
+Ardbeg 10,ardbeg-10,Класичний торф'яний віскі з острова Айла.,islay,peated,10,46%,https://example.com/images/ardbeg10.jpg
+Macallan 12 Sherry Oak,macallan-12-sherry-oak,"Витриманий у бочках з-під хересу, солодкий і насичений.",highlands,sherry-cask,12,40%,https://example.com/images/macallan12.jpg
+Jameson,jameson,Найвідоміший ірландський віскі.,irish-whiskey,blended-whisky,0,40%,https://example.com/images/jameson.jpg
+Jack Daniel’s Old No.7,jack-daniels-old-no7,Легендарний теннессійський віскі.,tennessee-whiskey,tennessee,0,40%,https://example.com/images/jackdaniels.jpg
+Yamazaki 12,yamazaki-12,"Японський односолодовий віскі, витриманий у бочках з-під хересу.",japanese-whisky,single-malt,12,43%,https://example.com/images/yamazaki12.jpg
+Canadian Club,canadian-club,Легкий канадський купажований віскі.,canada,blended-whisky,0,40%,https://example.com/images/canadianclub.jpg
+Amrut Fusion,amrut-fusion,"Індійський односолодовий віскі, популярний у світі.",india,single-malt,0,50%,https://example.com/images/amrutfusion.jpg
+Wild Turkey 101,wild-turkey-101,Бурбон з високою міцністю та насиченим смаком.,bourbon,bourbon-cask,0,50.5%,https://example.com/images/wildturkey101.jpg

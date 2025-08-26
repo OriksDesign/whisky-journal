@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html { @apply scroll-smooth; }
+  body { @apply bg-warm-bg text-gray-800 font-sans; }
+  h1,h2,h3,h4 { @apply font-display text-gray-900; }
+}
+
+/* Активний пункт меню */
+@layer utilities {
+  .menu .current-menu-item > a span { @apply underline decoration-accent; }
+  .nav-link { @apply hover:text-accent transition-colors; }
+}

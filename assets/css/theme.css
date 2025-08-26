@@ -1,0 +1,151 @@
+/* assets/css/theme.css */
+
+/* Змінні теми */
+:root{
+  --bg:#fff0e8;         /* кремовий фон сайту */
+  --card:#ffffff;       /* фон карток */
+  --text:#0f172a;       /* основний текст */
+  --muted:#475569;      /* другорядний текст */
+  --border:#e2e8f0;     /* бордери */
+  --badge:#f1f5f9;      /* бейджі */
+}
+html[data-theme="dark"]{
+  --bg:#0c1118;
+  --card:#121823;
+  --text:#e5e7eb;
+  --muted:#cbd5e1;
+  --border:#2b3440;
+  --badge:#1f2937;
+}
+
+/* База */
+body{ background:var(--bg) !important; color:var(--text); }
+.bg-white{ background:var(--card) !important; }
+.border-slate-200{ border-color:var(--border) !important; }
+
+/* Посилання у dark, щоб були читабельні */
+html[data-theme="dark"] a{ color:#93c5fd; }
+html[data-theme="dark"] a:hover{ color:#bfdbfe; }
+
+/* Підняти контраст текстів у dark */
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-gray-900{ color:var(--text) !important; }
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400{ color:var(--muted) !important; }
+/* прибираємо затемнення тексту через opacity */
+html[data-theme="dark"] [class*="text-"][style*="opacity"]{ opacity:1 !important; }
+/* світлі фони не мають «світитися» у dark */
+html[data-theme="dark"] .bg-slate-50,
+html[data-theme="dark"] .bg-slate-100,
+html[data-theme="dark"] .bg-white{ background:var(--card) !important; }
+html[data-theme="dark"] .border-slate-200{ border-color:var(--border) !important; }
+
+/* Бейдж ABV або інші мітки у кутку */
+.badge-abv,
+.whisky-card .absolute.top-2.right-2 > span{
+  background:var(--badge) !important;
+  color:var(--muted) !important;
+  border-color:var(--border) !important;
+}
+
+/* Картки віскі: тінь і ховер */
+.whisky-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  transition:transform .2s ease, box-shadow .2s ease;
+  box-shadow:0 1px 0 rgba(16,24,40,.06);
+}
+html[data-theme="dark"] .whisky-card{ box-shadow:0 1px 0 rgba(0,0,0,.25); }
+.whisky-card:hover{
+  transform:translateY(-2px) scale(1.01);
+  box-shadow:0 12px 28px rgba(16,24,40,.18);
+}
+
+/* Контейнер медіа на картці */
+.whisky-card .media{ position:relative; overflow:hidden; }
+
+/* Зображення не ріжемо, робимо м’який зум */
+.whisky-card .media img{
+  width:100%; height:100%;
+  object-fit:contain;
+  transition:transform .3s ease;
+}
+.whisky-card:hover .media img{ transform:scale(1.04); }
+
+/* Skeleton ефект під час завантаження */
+@keyframes shimmer{ 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+.whisky-card.is-loading .media::after{
+  content:""; position:absolute; inset:0; border-radius:12px;
+  background:linear-gradient(90deg,
+    rgba(148,163,184,.10) 0%,
+    rgba(148,163,184,.18) 20%,
+    rgba(148,163,184,.10) 40%);
+  background-size:200% 100%;
+  animation:shimmer 1.1s linear infinite;
+}
+html[data-theme="dark"] .whisky-card.is-loading .media::after{
+  background:linear-gradient(90deg,
+    rgba(148,163,184,.12) 0%,
+    rgba(148,163,184,.22) 20%,
+    rgba(148,163,184,.12) 40%);
+}
+
+/* Теплий текстурний фон у хедері */
+.hero-warm{
+  background:
+    radial-gradient(900px 320px at 12% -15%, rgba(255,200,160,.55), transparent 70%),
+    radial-gradient(700px 260px at 88% 0%, rgba(255,230,200,.45), transparent 65%),
+    var(--bg);
+}
+html[data-theme="dark"] .hero-warm{
+  background:
+    radial-gradient(900px 320px at 12% -15%, rgba(255,255,255,.06), transparent 70%),
+    radial-gradient(700px 260px at 88% 0%, rgba(255,255,255,.04), transparent 65%),
+    var(--bg);
+}
+
+/* Легкий стиль для lite-youtube */
+lite-youtube{
+  border:1px solid var(--border);
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 1px 0 rgba(16,24,40,.06);
+}
+html[data-theme="dark"] lite-youtube{ box-shadow:0 1px 0 rgba(0,0,0,.25); }
+/* Контейнер медіа на single: м’який фон, скруглення, фіксований аспект */
+.wj-media{
+  aspect-ratio: 4 / 3;
+  background: #eef3f7;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* На вузьких екранах можна дати «вищий» кадр, щоб пляшка виглядала краще */
+@media (max-width: 640px){
+  .wj-media{ aspect-ratio: 3 / 4; }
+}
+
+/* Зображення завжди *всередині* без кропу */
+.wj-img{
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+/* Відео 16:9 */
+.video-embed {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%;
+  background: #0f172a0d; /* легкий фон */
+}
+
+.video-embed iframe {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}

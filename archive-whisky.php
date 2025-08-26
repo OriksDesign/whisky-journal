@@ -1,46 +1,73 @@
 <?php
 /**
- * Archive – Whisky
+ * Template: Archive – Whiskies
  * URL: /whisky/
  */
-
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
 
 get_header();
 ?>
 
-<main id="primary" class="site-main container" style="max-width:1200px;margin:0 auto;padding:40px 20px;">
-	<header class="page-header" style="margin-bottom:24px;">
-		<h1 class="page-title" style="font-size:32px;margin:0;"><?php esc_html_e( 'Whiskies', 'whisky' ); ?></h1>
-	</header>
+<main class="max-w-screen-xl mx-auto px-4 py-8">
 
-	<?php if ( have_posts() ) : ?>
-		<div class="wj-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;">
-			<?php
-			while ( have_posts() ) :
-				the_post();
-				get_template_part( 'template-parts/content', 'whisky-card' );
-			endwhile;
-			?>
-		</div>
+  <!-- Sub-hero над фільтрами -->
+  <section class="relative overflow-hidden rounded-2xl bg-[#f4eade] dark:bg-slate-800/40 mb-6">
+    <div class="p-6 md:p-8">
+      <h1 class="text-2xl md:text-3xl font-bold tracking-tight">Whiskies</h1>
+      <p class="mt-2 text-slate-700 dark:text-slate-200">
+        Каталог віскі з фільтрами за регіонами, класифікаціями, віком та міцністю.
+      </p>
+      <div class="mt-4 flex gap-3">
+        <a href="<?php echo esc_url( home_url('/') ); ?>"
+           class="inline-flex items-center gap-2 rounded-xl border border-slate-300 px-4 py-2 hover:bg-slate-50 dark:border-slate-600 dark:hover:bg-slate-700 transition">
+          На головну
+        </a>
+        <a href="<?php echo esc_url( home_url('/whisky/') ); ?>"
+           class="inline-flex items-center gap-2 rounded-xl bg-slate-900 text-white px-4 py-2 hover:bg-slate-700 transition">
+          Оновити каталог
+        </a>
+      </div>
+    </div>
+  </section>
 
-		<nav class="pagination" style="margin-top:32px;">
-			<?php
-			the_posts_pagination( [
-				'mid_size'  => 2,
-				'prev_text' => '«',
-				'next_text' => '»',
-			] );
-			?>
-		</nav>
+  <?php
+  /**
+   * ФІЛЬТРИ
+   * Якщо маєш власну форму у цьому файлі — залиш її.
+   * Якщо винесено в окремий файл, розкоментуй наступний рядок і створи template-part:
+   * /template-parts/whisky-filters.php
+   */
+  // get_template_part( 'template-parts/whisky', 'filters' );
+  ?>
 
-	<?php else : ?>
+  <!-- Грід карток -->
+  <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
 
-		<p><?php esc_html_e( 'No whiskies found.', 'whisky' ); ?></p>
+    <?php if ( have_posts() ) : ?>
+      <?php while ( have_posts() ) : the_post(); ?>
+        <?php
+        // Картка віскі (наш оновлений файл)
+        get_template_part( 'template-parts/content', 'whisky-card' );
+        ?>
+      <?php endwhile; ?>
+    <?php else : ?>
+      <p class="text-slate-600">Нічого не знайдено. Змініть фільтри або спробуйте інший запит.</p>
+    <?php endif; ?>
 
-	<?php endif; ?>
+  </div>
+
+  <!-- Пагінація -->
+  <div class="mt-8">
+    <?php
+    the_posts_pagination([
+      'mid_size'  => 1,
+      'prev_text' => '«',
+      'next_text' => '»',
+      'screen_reader_text' => '',
+      'class' => 'flex items-center gap-2',
+    ]);
+    ?>
+  </div>
+
 </main>
 
 <?php
